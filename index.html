@@ -25,6 +25,10 @@
 <body>
     <div class="background-animation"></div>
 
+    <div class="app-logo-container">
+        <img src="logo.png" alt="Prize Superfruits Logo" class="app-logo" onerror="this.style.display='none'">
+    </div>
+
     <div class="lang-switcher">
         <button id="btn-es" class="lang-btn active" onclick="setLanguage('es')">🇪🇸 ES</button>
         <button id="btn-pt" class="lang-btn" onclick="setLanguage('pt')">🇧🇷 PT</button>
@@ -75,10 +79,21 @@
                     </div>
                 </div>
 
-                <div class="input-group">
-                    <i class="fa-solid fa-lock"></i>
-                    <input type="text" id="sello_naviera" name="sello_naviera" required placeholder=" " autocomplete="off" style="text-transform: uppercase;">
-                    <label for="sello_naviera" data-i18n="lbl_seal">Número Sello Naviera</label>
+                <div class="row">
+                    <div class="col">
+                        <div class="input-group">
+                            <i class="fa-solid fa-box"></i>
+                            <input type="text" id="numero_contenedor" name="numero_contenedor" required placeholder=" " autocomplete="off" style="text-transform: uppercase;">
+                            <label for="numero_contenedor" data-i18n="lbl_container">Número de Contenedor</label>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="input-group">
+                            <i class="fa-solid fa-lock"></i>
+                            <input type="text" id="sello_naviera" name="sello_naviera" required placeholder=" " autocomplete="off" style="text-transform: uppercase;">
+                            <label for="sello_naviera" data-i18n="lbl_seal">Número Sello Naviera</label>
+                        </div>
+                    </div>
                 </div>
 
                 <button type="submit" class="btn-primary">
@@ -122,6 +137,7 @@
                             <th data-i18n="th_phone">Celular</th>
                             <th data-i18n="th_truck">Camión</th>
                             <th data-i18n="th_chassis">Chasis</th>
+                            <th data-i18n="th_container">Contenedor</th>
                             <th data-i18n="th_seal">Sello Naviera</th>
                         </tr>
                     </thead>

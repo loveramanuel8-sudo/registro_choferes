@@ -35,6 +35,7 @@ function handleFormSubmit(e) {
         celular: formData.get('celular'),
         patente_camion: formData.get('patente_camion').toUpperCase(),
         patente_chasis: formData.get('patente_chasis').toUpperCase(),
+        numero_contenedor: formData.get('numero_contenedor').toUpperCase(),
         sello_naviera: formData.get('sello_naviera').toUpperCase(),
         timestamp: now.toISOString()
     };
@@ -114,7 +115,7 @@ function renderTable() {
     const paginatedItems = records.slice(start, end);
     
     if (paginatedItems.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">No hay registros</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;">No hay registros</td></tr>`;
     } else {
         paginatedItems.forEach(item => {
             const tr = document.createElement('tr');
@@ -125,6 +126,7 @@ function renderTable() {
                 <td>${item.celular}</td>
                 <td>${item.patente_camion}</td>
                 <td>${item.patente_chasis}</td>
+                <td>${item.numero_contenedor || '-'}</td>
                 <td>${item.sello_naviera || '-'}</td>
             `;
             tbody.appendChild(tr);
@@ -194,6 +196,7 @@ function exportToExcel() {
         "Celular": r.celular,
         "Patente Camión": r.patente_camion,
         "Patente Chasis": r.patente_chasis,
+        "Contenedor": r.numero_contenedor || '-',
         "Sello Naviera": r.sello_naviera || '-'
     }));
 
@@ -203,7 +206,7 @@ function exportToExcel() {
     
     // Auto-size columns roughly
     const wscols = [
-        {wch: 20}, {wch: 30}, {wch: 15}, {wch: 15}, {wch: 15}, {wch: 15}, {wch: 20}
+        {wch: 20}, {wch: 30}, {wch: 15}, {wch: 15}, {wch: 15}, {wch: 15}, {wch: 20}, {wch: 20}
     ];
     worksheet['!cols'] = wscols;
 
