@@ -115,7 +115,7 @@ function renderTable() {
     const paginatedItems = records.slice(start, end);
     
     if (paginatedItems.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;">No hay registros</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;">No hay registros</td></tr>`;
     } else {
         paginatedItems.forEach(item => {
             const tr = document.createElement('tr');
@@ -128,6 +128,10 @@ function renderTable() {
                 <td>${item.patente_chasis}</td>
                 <td>${item.numero_contenedor || '-'}</td>
                 <td>${item.sello_naviera || '-'}</td>
+                <td class="actions-cell">
+                    <button onclick="editRecord(${item.id})" class="btn-icon btn-edit" title="${translations[currentLang].btn_edit}"><i class="fa-solid fa-pen"></i></button>
+                    <button onclick="deleteRecord(${item.id})" class="btn-icon btn-delete" title="${translations[currentLang].btn_delete}"><i class="fa-solid fa-trash"></i></button>
+                </td>
             `;
             tbody.appendChild(tr);
         });
@@ -174,6 +178,124 @@ function nextPage() {
         currentPage++;
         renderTable();
     }
+}
+
+// --- ACTIONS ---
+function deleteRecord(id) {
+    Swal.fire({
+        title: translations[currentLang].msg_delete_title,
+        text: translations[currentLang].msg_delete_text,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#EF4444',
+        cancelButtonColor: '#64748B',
+        confirmButtonText: translations[currentLang].btn_delete,
+        cancelButtonText: translations[currentLang].btn_cancel,
+        background: '#FFFFFF',
+        color: '#000000'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            records = records.filter(r => r.id !== id);
+            localStorage.setItem('portalChoferes_records', JSON.stringify(records));
+            renderTable();
+            Swal.fire({
+                title: translations[currentLang].msg_deleted,
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false,
+                background: '#FFFFFF',
+                color: '#000000'
+            });
+        }
+    });
+}
+
+function editRecord(id) {
+    const record = records.find(r => r.id === id);
+    if (!record) return;
+
+    Swal.fire({
+        title: translations[currentLang].title_edit,
+        html: `
+            <div style="text-align: left; margin-top: 10px;">
+                <label style="font-weight:bold; font-size: 0.9em; color:#475569;">${translations[currentLang].lbl_name}</label>
+                <input id="edit-nombre" class="swal2-input" value="${record.nombre}" style="margin-top:0; margin-bottom:15px; width: 100%; box-sizing: border-box;">
+                
+                <label style="font-weight:bold; font-size: 0.9em; color:#475569;">${translations[currentLang].lbl_rut}</label>
+                <input id="edit-rut" class="swal2-input" value="${record.rut}" style="margin-top:0; margin-bottom:15px; width: 100%; box-sizing: border-box;">
+                
+                <label style="font-weight:bold; font-size: 0.9em; color:#475569;">${translations[currentLang].lbl_phone}</label>
+                <input id="edit-celular" type="tel" class="swal2-input" value="${record.celular}" style="margin-top:0; margin-bottom:15px; width: 100%; box-sizing: border-box;">
+                
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1;">
+                        <label style="font-weight:bold; font-size: 0.9em; color:#475569;">${translations[currentLang].lbl_truck_plate}</label>
+                        <input id="edit-camion" class="swal2-input" value="${record.patente_camion}" style="margin-top:0; margin-bottom:15px; width: 100%; box-sizing: border-box; text-transform:uppercase;">
+                    </div>
+                    <div style="flex:1;">
+                        <label style="font-weight:bold; font-size: 0.9em; color:#475569;">${translations[currentLang].lbl_chassis_plate}</label>
+                        <input id="edit-chasis" class="swal2-input" value="${record.patente_chasis}" style="margin-top:0; margin-bottom:15px; width: 100%; box-sizing: border-box; text-transform:uppercase;">
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1;">
+                        <label style="font-weight:bold; font-size: 0.9em; color:#475569;">${translations[currentLang].lbl_container}</label>
+                        <input id="edit-contenedor" class="swal2-input" value="${record.numero_contenedor || ''}" style="margin-top:0; margin-bottom:15px; width: 100%; box-sizing: border-box; text-transform:uppercase;">
+                    </div>
+                    <div style="flex:1;">
+                        <label style="font-weight:bold; font-size: 0.9em; color:#475569;">${translations[currentLang].lbl_seal}</label>
+                        <input id="edit-sello" class="swal2-input" value="${record.sello_naviera || ''}" style="margin-top:0; margin-bottom:15px; width: 100%; box-sizing: border-box; text-transform:uppercase;">
+                    </div>
+                </div>
+            </div>
+        `,
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: translations[currentLang].btn_save,
+        cancelButtonText: translations[currentLang].btn_cancel,
+        confirmButtonColor: '#2563EB',
+        cancelButtonColor: '#64748B',
+        background: '#FFFFFF',
+        color: '#000000',
+        width: '600px',
+        preConfirm: () => {
+            const nombre = document.getElementById('edit-nombre').value;
+            const rut = document.getElementById('edit-rut').value;
+            const celular = document.getElementById('edit-celular').value;
+            const camion = document.getElementById('edit-camion').value.toUpperCase();
+            const chasis = document.getElementById('edit-chasis').value.toUpperCase();
+            const contenedor = document.getElementById('edit-contenedor').value.toUpperCase();
+            const sello = document.getElementById('edit-sello').value.toUpperCase();
+            
+            if (!nombre || !rut || !celular || !camion || !chasis) {
+                Swal.showValidationMessage('Por favor completa los campos obligatorios / Por favor preencha os campos obrigatórios');
+                return false;
+            }
+            return { nombre, rut, celular, camion, chasis, contenedor, sello };
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            record.nombre = result.value.nombre;
+            record.rut = result.value.rut;
+            record.celular = result.value.celular;
+            record.patente_camion = result.value.camion;
+            record.patente_chasis = result.value.chasis;
+            record.numero_contenedor = result.value.contenedor;
+            record.sello_naviera = result.value.sello;
+            
+            localStorage.setItem('portalChoferes_records', JSON.stringify(records));
+            renderTable();
+            Swal.fire({
+                title: translations[currentLang].msg_edit_success,
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false,
+                background: '#FFFFFF',
+                color: '#000000'
+            });
+        }
+    });
 }
 
 // --- EXPORT TO EXCEL ---
