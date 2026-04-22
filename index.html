@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal de Choferes</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- SheetJS for Excel -->
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="background-animation"></div>
+
+    <div class="lang-switcher">
+        <button id="btn-es" class="lang-btn active" onclick="setLanguage('es')">🇪🇸 ES</button>
+        <button id="btn-pt" class="lang-btn" onclick="setLanguage('pt')">🇧🇷 PT</button>
+    </div>
+
+    <!-- Vista de Registro -->
+    <div id="vista-registro" class="container view active">
+        <div class="glass-card">
+            <div class="card-header">
+                <i class="fa-solid fa-truck-fast logo-icon"></i>
+                <h1 data-i18n="title_register">Registro de Choferes</h1>
+                <p data-i18n="subtitle_register">Por favor, ingrese sus datos de llegada</p>
+            </div>
+
+            <form id="registro-form">
+                <div class="input-group">
+                    <i class="fa-solid fa-user"></i>
+                    <input type="text" id="nombre" name="nombre" required placeholder=" " autocomplete="off">
+                    <label for="nombre" data-i18n="lbl_name">Nombre y apellido</label>
+                </div>
+
+                <div class="input-group">
+                    <i class="fa-solid fa-id-card"></i>
+                    <input type="text" id="rut" name="rut" required placeholder=" " autocomplete="off">
+                    <label for="rut" data-i18n="lbl_rut">RUT / Documento</label>
+                </div>
+
+                <div class="input-group">
+                    <i class="fa-solid fa-mobile-screen-button"></i>
+                    <input type="tel" id="celular" name="celular" required placeholder=" " autocomplete="off">
+                    <label for="celular" data-i18n="lbl_phone">Número de celular</label>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <div class="input-group">
+                            <i class="fa-solid fa-truck"></i>
+                            <input type="text" id="patente_camion" name="patente_camion" required placeholder=" " autocomplete="off" style="text-transform: uppercase;">
+                            <label for="patente_camion" data-i18n="lbl_truck_plate">Patente Camión</label>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="input-group">
+                            <i class="fa-solid fa-trailer"></i>
+                            <input type="text" id="patente_chasis" name="patente_chasis" required placeholder=" " autocomplete="off" style="text-transform: uppercase;">
+                            <label for="patente_chasis" data-i18n="lbl_chassis_plate">Patente Chasis</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="text" id="sello_naviera" name="sello_naviera" required placeholder=" " autocomplete="off" style="text-transform: uppercase;">
+                    <label for="sello_naviera" data-i18n="lbl_seal">Número Sello Naviera</label>
+                </div>
+
+                <button type="submit" class="btn-primary">
+                    <i class="fa-solid fa-check"></i> <span data-i18n="btn_submit">Registrar Llegada</span>
+                </button>
+            </form>
+
+            <div class="card-footer">
+                <button onclick="promptAdminAccess()" class="btn-link" type="button">
+                    <i class="fa-solid fa-clock-rotate-left"></i> <span data-i18n="link_history">Ver historial de ingresos</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vista de Historial -->
+    <div id="vista-historial" class="container view">
+        <div class="glass-card table-card">
+            <div class="card-header table-header">
+                <div class="title-area">
+                    <i class="fa-solid fa-list-ul"></i>
+                    <h1 data-i18n="title_history">Historial de Ingresos</h1>
+                </div>
+                <div class="actions-area">
+                    <button onclick="exportToExcel()" class="btn-success">
+                        <i class="fa-solid fa-file-excel"></i> <span data-i18n="btn_export">Exportar</span>
+                    </button>
+                    <button onclick="switchView('vista-registro')" class="btn-secondary">
+                        <i class="fa-solid fa-arrow-left"></i> <span data-i18n="btn_back">Volver</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table id="historial-table">
+                    <thead>
+                        <tr>
+                            <th data-i18n="th_date">Hora Ingreso</th>
+                            <th data-i18n="th_name">Nombre</th>
+                            <th data-i18n="th_rut">RUT</th>
+                            <th data-i18n="th_phone">Celular</th>
+                            <th data-i18n="th_truck">Camión</th>
+                            <th data-i18n="th_chassis">Chasis</th>
+                            <th data-i18n="th_seal">Sello Naviera</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historial-body">
+                        <!-- Las filas se inyectan acá -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination">
+                <button id="btn-prev" onclick="prevPage()"><i class="fa-solid fa-chevron-left"></i></button>
+                <span id="page-info">Página 1 de 1</span>
+                <button id="btn-next" onclick="nextPage()"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="i18n.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
